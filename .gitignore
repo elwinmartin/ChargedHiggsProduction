@@ -7,6 +7,10 @@ obj/
 a.out
 *.bin
 *.a26
-
+*.x
 # Add in special Atari 7800-based binaries for good measure
 *.a78
+
+# Ignoring the data files, for now
+*.dat
+
