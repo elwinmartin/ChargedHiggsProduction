@@ -24,7 +24,7 @@ c
       external f
 c
       open(unit=7, file='output.dat',status='old')
-      open(unit=8, file='outputmass.dat',position='append',status='old')
+      open(unit=8, file='outputmass.dat',status='old')
 
 c
 c      open(unit=10,file='topgugam2a1960muzetanew.dat',status='new')
@@ -46,7 +46,7 @@ c
       print '(''born (0), 1st ord.(1), 2nd ord(2):'',i2)',norder
       print '(''number of flavors :'',d20.7)',nf
       print '(''square root of s for p-pbar:'',d20.7)',srcaps
-      print '(''charged higgs mass:'',d20.7)',mq
+      print '(''heavy quark mass in gev/c^2:'',d20.7)',mq
       print '(''qcdl4:'',d20.7)',qcdl4
       print '(''scale (1)m (0)m/2 (2)2m:'',i2)',nscale
 c
@@ -54,8 +54,8 @@ c
 c
 c computation of the total cross section:
 c   lines 56 [m2] to 63 [endif] were originally in the code!
-c      do 510 iloop= 1,20
-c      mql(iloop) = 50d0*dble(iloop-1.d0) + 500.d0
+c      do 510 iloop= 1,16
+c      mql(iloop) = 1d0*dble(iloop-1.d0) + 165.d0
 c      mq=mql(iloop)        
       m2 = mq*mq
       if (nscale.eq.0) then
@@ -66,14 +66,14 @@ c      mq=mql(iloop)
                q2 = 4.d0*m2
        endif
 c-------mu dependence----------
-c      m2 = mq*mq
-c      do 510 iloop= 1,20
-c       if (iloop .le. 10) then
-c        q2l(iloop) =dble(iloop)/10.d0 
-c         else
-c        q2l(iloop)=dble(iloop)-10.d0
-c       endif
-c      q2=m2*(q2l(iloop))**2
+      m2 = mq*mq
+      do 510 iloop= 1,20
+       if (iloop .le. 10) then
+        q2l(iloop) =dble(iloop)/10.d0 
+         else
+        q2l(iloop)=dble(iloop)-10.d0
+       endif
+      q2=m2*(q2l(iloop))**2
 c------end of mu dep----------------
 c The above, lines 64 - 74 [ten lines ish] were originally commented out!!
          mu=dsqrt(q2)
@@ -142,7 +142,7 @@ c we do the integrals in the order T,U,xb,s2
 c
 c Definition of the integration variables
 c
-      MW2 = 80.385d0*80.385d0
+      MW2 = 1
 c This is a placeholder mass, clearly
       Tmax = -1.d0/2.d0*(SS-MW2-m2)
      & +1.d0/2.d0*dsqrt((SS-m2-MW2)**2-4.d0*m2*MW2)
@@ -224,18 +224,18 @@ c
         scale=dsqrt(q2)
         iset=isetmstw
 c
-      G1   = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XA,scale,0)
-      UT1  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XA,scale,5)
-      UV1  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XA,scale,11)
+      G1   = GetOnePDF("Grids/mstw2008nnlo.90cl",iset,XA,scale,0)
+      UT1  = GetOnePDF("Grids/mstw2008nnlo.90cl",iset,XA,scale,5)
+      UV1  = GetOnePDF("Grids/mstw2008nnlo.90cl",iset,XA,scale,11)
 c
       G1XA = G1/XA
       UTXA = UT1/XA
       USXA = (UT1-UV1)/XA
       UVXA = UV1/XA
 c
-      G2   = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XB,scale,0)
-      UT2  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XB,scale,5)
-      UV2  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XB,scale,11)
+      G2   = GetOnePDF("Grids/mstw2008nnlo.90cl",iset,XB,scale,0)
+      UT2  = GetOnePDF("Grids/mstw2008nnlo.90cl",iset,XB,scale,5)
+      UV2  = GetOnePDF("Grids/mstw2008nnlo.90cl",iset,XB,scale,11)
 c Idk if this is correct since I need b-bar...
       G2XB = G2/XB
       UTXB = UT2/XB
@@ -315,18 +315,18 @@ c Compute the parton densities
         scale=dsqrt(q2)
         iset=isetmstw
 c
-      G1   = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XA,scale,0)
-      UT1  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XA,scale,5)
-      UV1  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XA,scale,11)
+      G1   = GetOnePDF("Grids/mstw2008nnlo.90cl",iset,XA,scale,0)
+      UT1  = GetOnePDF("Grids/mstw2008nnlo.90cl",iset,XA,scale,5)
+      UV1  = GetOnePDF("Grids/mstw2008nnlo.90cl",iset,XA,scale,11)
 c
       G1XA = G1/XA
       UTXA = UT1/XA
       USXA = (UT1-UV1)/XA
       UVXA = UV1/XA
 c
-      G2   = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XB,scale,0)
-      UT2  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XB,scale,5)
-      UV2  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XB,scale,11)
+      G2   = GetOnePDF("Grids/mstw2008nnlo.90cl",iset,XB,scale,0)
+      UT2  = GetOnePDF("Grids/mstw2008nnlo.90cl",iset,XB,scale,5)
+      UV2  = GetOnePDF("Grids/mstw2008nnlo.90cl",iset,XB,scale,11)
 c
       G2XB = G2/XB
       UTXB = UT2/XB
@@ -724,26 +724,19 @@ c as if this doesn't evolve lolol
       kg=0.1d0
       ee=0.31333d0
       gg2=4.d0*pi*alfas
-      alfa=1.d0/128.d0
+      alfa=1.d0/137.d0
       alfa2=alfa*alfa 
       v=dsqrt(1-4.d0*m2/sh)
       v3=v*v*v
-      eq=-1.d0/3.d0
+      eq=1.d0/3.d0
       Tl=-0.5d0
       cv=Tl-2.d0*q*sw2
       ca=Tl
-      tb=1.2d0
-      cb=1.d0/tb
 c uhhh about that alpha
 c    
       tm = t1 + m2
       um = u1 + m2
-      mz2 = 91.1876d0*91.1876d0
-      mt=100.d0
-      mt2=mt*mt
-      mt4=mt2**2
-      MW2=80.385d0**2
-c
+
       coef=pi/9.d0*alfa2*v3
       brkt=eq**2+0.5d0*eq*cv*c2w/sw2/cw2*sh/(sh-mz2) + 
      & 1.d0/16.d0*(cv2+ca2)*c2w2/sw4/cw4*sh**2/(sh-mz2)**2
@@ -754,19 +747,14 @@ c
        Matrel2g=(4*ee**2*gg2*kg**2*(m2-sh-tm)
      & *(m2**3-m2**2*sh-2.d0*sh*tm**2+m2*tm*(3.d0*sh+tm)))
      & /(3.d0*m2*sh*(m2-tm)**2)
-      Matrel2g=coef*brkt
-c uhhh so that's bb to hh... I messed up 
-       
-      coef=pi*alfa2*mt4*cb**2/96.d0/sw2/MW2/(um-mt2)**2
-      brk1=sh+(um-MW2)*(tm-MW2)/MW2
-      brk2=(1-(MW2+m2)/sh)**2-4.d0*MW2*m2/sh**2
-      Matrel2g=coef*brk1*dsqrt(brk2)
-c  
+      Matrel2=coef*brkt
+c 
+c  Original line is below ....
       qqdtdu = norm*Matrel2g/16.d0/pi/sh**2
-c       qqdtdu = norm*Matrel2g/sh**2
+c
 
 c
-c      print '(''qqdtdu='',d20.7)',MW2
+c      print '(''qqdtdu='',d20.7)',qqdtdu
 c
       return
       end

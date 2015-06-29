@@ -1,4 +1,4 @@
-      program bbHW
+      program bbHH
 c-----------------------------------------------------------
 c  This program calculates the NLO and NNLO soft 
 c  corrections to FCNC top quark + gamma production
@@ -29,7 +29,7 @@ c
 c
 c      open(unit=10,file='topgugam2a1960muzetanew.dat',status='new')
 
-      open(unit=11, file='bbhw.dat',status='old')
+      open(unit=11, file='bbhh.dat',status='old')
       rewind 11
 c
       read(11,*)pts
@@ -142,43 +142,42 @@ c we do the integrals in the order T,U,xb,s2
 c
 c Definition of the integration variables
 c
-      MW2 = 80.385d0*80.385d0
-c This is a placeholder mass, clearly
-      Tmax = -1.d0/2.d0*(SS-MW2-m2)
-     & +1.d0/2.d0*dsqrt((SS-m2-MW2)**2-4.d0*m2*MW2)
-      Tmin =-1.d0/2.d0*(SS-MW2-m2)
-     & -1.d0/2.d0*dsqrt((SS-MW2-m2)**2-4.d0*m2*MW2) 
+c Lived dangerously and used a replace all for MW2 to M2 in the code...
+      Tmax = -1.d0/2.d0*(SS-m2-m2)
+     & +1.d0/2.d0*dsqrt((SS-m2-m2)**2-4.d0*m2*m2)
+      Tmin =-1.d0/2.d0*(SS-m2-m2)
+     & -1.d0/2.d0*dsqrt((SS-m2-m2)**2-4.d0*m2*m2) 
       TT=Tmin+x(1)*(Tmax-Tmin)
       jacob1=Tmax-Tmin
 c
-      Umax = MW2+MW2*SS/(TT-MW2)
-      Umin = -SS-TT+MW2+m2
+      Umax = m2+m2*SS/(TT-m2)
+      Umin = -SS-TT+m2+m2
       UU=Umin+x(2)*(Umax-Umin)
       jacob2=Umax-Umin
 c
       xbmax = 1.d0
-      xbmin = (m2-TT)/(SS+UU-MW2)
+      xbmin = (m2-TT)/(SS+UU-m2)
       xb=xbmin+x(3)*(xbmax-xbmin)
       jacob3=xbmax-xbmin
 c
-      s4max=xb*(SS+UU-MW2)+TT-m2
+      s4max=xb*(SS+UU-m2)+TT-m2
       s4min=0.d0 
       ss4=s4min+x(4)*(s4max-s4min)
       jacob4=s4max-s4min
 c
-      xa=(ss4-MW2+m2-xb*(UU-MW2))/(xb*SS+TT-MW2)
-      xael=(-MW2+m2-xb*(UU-MW2))/(xb*SS+TT-MW2)
+      xa=(ss4-m2+m2-xb*(UU-m2))/(xb*SS+TT-m2)
+      xael=(-m2+m2-xb*(UU-m2))/(xb*SS+TT-m2)
       xbel=xb
 
-      t1 = xa*(TT-MW2)
-      t1el=xael*(TT-MW2) 
-      u1 = xb*(UU-MW2)
+      t1 = xa*(TT-m2)
+      t1el=xael*(TT-m2) 
+      u1 = xb*(UU-m2)
       u1el=u1 
       sh = xa*xb*SS
       shel=xael*xbel*SS
 c
-      hjacob=xa*xb/(xb*SS+TT-MW2)
-      ejacob=xael*xbel/(xbel*SS+TT-MW2)
+      hjacob=xa*xb/(xb*SS+TT-m2)
+      ejacob=xael*xbel/(xbel*SS+TT-m2)
 c
 c---------------------------------------------------------------------
 c We call the elastic and the inelastic subroutines separately.
@@ -739,10 +738,10 @@ c
       tm = t1 + m2
       um = u1 + m2
       mz2 = 91.1876d0*91.1876d0
-      mt=100.d0
+      mt=173.d0
       mt2=mt*mt
       mt4=mt2**2
-      MW2=80.385d0**2
+c      m2=80.385d0**2
 c
       coef=pi/9.d0*alfa2*v3
       brkt=eq**2+0.5d0*eq*cv*c2w/sw2/cw2*sh/(sh-mz2) + 
@@ -751,22 +750,13 @@ c
       mu=dsqrt(q2)
 c Matrix element squared
 c
-       Matrel2g=(4*ee**2*gg2*kg**2*(m2-sh-tm)
-     & *(m2**3-m2**2*sh-2.d0*sh*tm**2+m2*tm*(3.d0*sh+tm)))
-     & /(3.d0*m2*sh*(m2-tm)**2)
       Matrel2g=coef*brkt
-c uhhh so that's bb to hh... I messed up 
-       
-      coef=pi*alfa2*mt4*cb**2/96.d0/sw2/MW2/(um-mt2)**2
-      brk1=sh+(um-MW2)*(tm-MW2)/MW2
-      brk2=(1-(MW2+m2)/sh)**2-4.d0*MW2*m2/sh**2
-      Matrel2g=coef*brk1*dsqrt(brk2)
-c  
+c 
       qqdtdu = norm*Matrel2g/16.d0/pi/sh**2
-c       qqdtdu = norm*Matrel2g/sh**2
+c     Normalization could be wrong!
 
 c
-c      print '(''qqdtdu='',d20.7)',MW2
+c      print '(''qqdtdu='',d20.7)',m2
 c
       return
       end

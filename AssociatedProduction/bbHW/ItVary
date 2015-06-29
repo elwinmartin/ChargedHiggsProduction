@@ -3,13 +3,12 @@
 #gfortran -mips2 bbhw.o vegas_en.o mstwpdf.o alphaS.o -o bbhw.x
 #./bbhw.x
 
-decimal=".d0"
 
-for i in `seq 1 50`
+for i in `seq 1 20`
 do
-        num=$((200 + 16 *$i))
-        arg=$num$decimal
-        sed -i 6s/.*/"$arg"/ bbhw.dat
+        num=$((19 + $i))
+        arg=$num
+        sed -i 2s/.*/"$arg"/ bbhw.dat
         ./bbhw.x
 #        echo $arg
 #        cat gutg.dat
