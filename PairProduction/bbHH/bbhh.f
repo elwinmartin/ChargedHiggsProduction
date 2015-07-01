@@ -66,14 +66,14 @@ c      mq=mql(iloop)
                q2 = 4.d0*m2
        endif
 c-------mu dependence----------
-c      m2 = mq*mq
-c      do 510 iloop= 1,20
-c       if (iloop .le. 10) then
-c        q2l(iloop) =dble(iloop)/10.d0 
-c         else
-c        q2l(iloop)=dble(iloop)-10.d0
-c       endif
-c      q2=m2*(q2l(iloop))**2
+      m2 = mq*mq
+      do 510 iloop= 1,20
+       if (iloop .le. 10) then
+        q2l(iloop) =dble(iloop)/10.d0 
+         else
+        q2l(iloop)=dble(iloop)-10.d0
+       endif
+      q2=m2*(q2l(iloop))**2
 c------end of mu dep----------------
 c The above, lines 64 - 74 [ten lines ish] were originally commented out!!
          mu=dsqrt(q2)
@@ -423,21 +423,27 @@ c
        uel = u1el + m2
 c
        mq=dsqrt(m2)
-       ReGSel=cf*dlog(-u1el/mq/dsqrt(shel))
-     & +ca/2.d0*dlog(t1el/u1el)+ca/2.d0 
+c       ReGSel=cf*dlog(-u1el/mq/dsqrt(shel))
+c     & +ca/2.d0*dlog(t1el/u1el)+ca/2.d0 
 c
-       c3m=2.d0*(cf+ca)
-       c2mel=2.d0*ReGSel-cf-ca-2.d0*cf*dlog(-tel/m2)
-     & -2.d0*ca*dlog(-uel/m2)-(cf+ca)*dlog(mu**2/shel)
+       c3m=4.d0*cf
+       c2mel=-2.d0*cf*dlog(-tel/m2)-2.d0*cf*dlog(mu**2/m2)
+     & -2.d0*ca*dlog(-uel/m2)-2.d0*cf*dlog(m2/shel)
 c
 c The NNLL MSbar \delta(s_4) term
 c
-      c1mel=(cf*dlog(-tel/m2)+ca*dlog(-uel/m2)-3.d0/4.d0*cf)
-     & *dlog(mu**2/m2)
+      c1mel=(dlog(-tel/m2)+dlog(-uel/m2)-3.d0/2.d0)
+     & *dlog(mu**2/m2)*cf
 c
+      c1mel=0
+      c2mel=0      
+c     
 c MSbar NLL
       f1=(c3m*lns4max**2/2.d0+c2mel*lns4max+c1mel)
      & *alfas/pi*sigb0         
+c
+c      print '(''df1ds4='',d20.7)',f1
+
 c
 c Computation of  surface term:
       s6=f1
@@ -486,17 +492,19 @@ c
        uinel = u1 + m2        
 c
        mq=dsqrt(m2)
-       ReGSel=cf*dlog(-u1el/mq/dsqrt(shel))
-     & +ca/2.d0*dlog(t1el/u1el)+ca/2.d0 
-       ReGSin=cf*dlog(-u1/mq/dsqrt(sh))
-     & +ca/2.d0*dlog(t1/u1)+ca/2.d0
+c       ReGSel=cf*dlog(-u1el/mq/dsqrt(shel))
+c     & +ca/2.d0*dlog(t1el/u1el)+ca/2.d0 
+c       ReGSin=cf*dlog(-u1/mq/dsqrt(sh))
+c     & +ca/2.d0*dlog(t1/u1)+ca/2.d0
 c
-       c3m=2.d0*(cf+ca)
-       c2mel=2.d0*ReGSel-cf-ca-2.d0*cf*dlog(-tel/m2)
-     & -2.d0*ca*dlog(-uel/m2)-(cf+ca)*dlog(mu**2/shel)
-       c2minel=2.d0*ReGSin-cf-ca-2.d0*cf*dlog(-tinel/m2)
-     & -2.d0*ca*dlog(-uinel/m2)-(cf+ca)*dlog(mu**2/sh)
+       c3m=4.d0*cf
+       c2mel=-2.d0*dlog(mu**2/m2)-2.d0*cf*dlog(m2/shel)
+     & -2.d0*cf*dlog(-uel/m2)-2.d0*cf*dlog(-tel/m2)
+       c2minel=-2.d0*dlog(mu**2/m2)-2.d0*cf*dlog(m2/sh)
+     & -2.d0*cf*dlog(-uinel/m2)-2.d0*cf*dlog(-tinel/m2)
 c
+       c2minel=0
+       c2mel=0
 c MSbar NLL
       df1ds4inel=(c3m*lns4/ss4+c2minel/ss4)
      & *alfas/pi*sigbs4
@@ -504,13 +512,15 @@ c
       df1ds4el=(c3m*lns4/ss4+c2mel/ss4)
      & *alfas/pi*sigb0
 c
-cnk      print '(''df1ds4='',d20.7)',df1ds4
+c      print '(''df1ds4='',d20.7)',df1ds4inel
+c      print '(''df1ds4='',d20.7)',df1ds4inel
+c
 c Computation of integral and surface term:
         int1=df1ds4inel*sfpartinel*hjacob
      &   -df1ds4el*sfpartel*ejacob
 cnk      print '(''sfpartinel='',d20.7)',sfpartinel
 cnk      print '(''sfpartel='',d20.7)',sfpartel
-cnk      print '(''int1='',d20.7)',int1
+c      print '(''int1='',d20.7)',int1
 c
 cnk      print '(''coef='',d20.7)',coef
       s6=int1

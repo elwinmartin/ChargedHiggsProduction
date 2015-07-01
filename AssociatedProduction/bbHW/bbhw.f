@@ -169,6 +169,8 @@ c
       xa=(ss4-MW2+m2-xb*(UU-MW2))/(xb*SS+TT-MW2)
       xael=(-MW2+m2-xb*(UU-MW2))/(xb*SS+TT-MW2)
       xbel=xb
+c      temp=TT-MW2
+c      print '(''f='',d20.7)',temp
 
       t1 = xa*(TT-MW2)
       t1el=xael*(TT-MW2) 
@@ -421,24 +423,33 @@ c
       zeta2=pi*pi/6.d0
 c
        tel = t1el + m2
+c temporary
+c       tel =ABS(tel)
        uel = u1el + m2
 c
        mq=dsqrt(m2)
-       ReGSel=cf*dlog(-u1el/mq/dsqrt(shel))
-     & +ca/2.d0*dlog(t1el/u1el)+ca/2.d0 
+c       ReGSel=cf*dlog(-u1el/mq/dsqrt(shel))
+c     & +ca/2.d0*dlog(t1el/u1el)+ca/2.d0 
+c c3 is good
+       c3m=4.d0*cf
+       c2mel=-2.d0*cf*dlog(mu**2/m2)-2.d0*cf*dlog(m2/shel)
+     & -2.d0*cf*dlog(-uel/m2)-2.d0*dlog(-tel/m2)
 c
-       c3m=2.d0*(cf+ca)
-       c2mel=2.d0*ReGSel-cf-ca-2.d0*cf*dlog(-tel/m2)
-     & -2.d0*ca*dlog(-uel/m2)-(cf+ca)*dlog(mu**2/shel)
+c The minus sign should be checked
 c
 c The NNLL MSbar \delta(s_4) term
 c
-      c1mel=(cf*dlog(-tel/m2)+ca*dlog(-uel/m2)-3.d0/4.d0*cf)
-     & *dlog(mu**2/m2)
+      c1mel=(dlog(-tel/m2)+dlog(-uel/m2)-3.d0/2.d0)
+     & *dlog(mu**2/m2)*cf
 c
+c toying with the code
+      c1mel=0
+      c2mel=0
 c MSbar NLL
       f1=(c3m*lns4max**2/2.d0+c2mel*lns4max+c1mel)
      & *alfas/pi*sigb0         
+c      print '(''f1='',d20.7)',f1
+
 c
 c Computation of  surface term:
       s6=f1
@@ -487,16 +498,27 @@ c
        uinel = u1 + m2        
 c
        mq=dsqrt(m2)
-       ReGSel=cf*dlog(-u1el/mq/dsqrt(shel))
-     & +ca/2.d0*dlog(t1el/u1el)+ca/2.d0 
-       ReGSin=cf*dlog(-u1/mq/dsqrt(sh))
-     & +ca/2.d0*dlog(t1/u1)+ca/2.d0
+c       ReGSel=cf*dlog(-u1el/mq/dsqrt(shel))
+c     & +ca/2.d0*dlog(t1el/u1el)+ca/2.d0 
+c       ReGSin=cf*dlog(-u1/mq/dsqrt(sh))
+c     & +ca/2.d0*dlog(t1/u1)+ca/2.d0
 c
-       c3m=2.d0*(cf+ca)
-       c2mel=2.d0*ReGSel-cf-ca-2.d0*cf*dlog(-tel/m2)
-     & -2.d0*ca*dlog(-uel/m2)-(cf+ca)*dlog(mu**2/shel)
-       c2minel=2.d0*ReGSin-cf-ca-2.d0*cf*dlog(-tinel/m2)
-     & -2.d0*ca*dlog(-uinel/m2)-(cf+ca)*dlog(mu**2/sh)
+       c3m=4.d0*cf
+       c2mel=-2.d0*cf*dlog(mu**2/m2)-2.d0*cf*dlog(m2/shel)
+     & -2.d0*cf*dlog(-uel/m2)-2.d0*dlog(-tel/m2)
+       c2minel=-2.d0*cf*dlog(mu**2/m2)-2.d0*cf*dlog(m2/sh)
+     & -2.d0*cf*dlog(-uinel/m2)-2.d0*dlog(-tinel/m2)
+cc
+c
+c       c3m=2.d0*(cf+ca)
+c       c2mel=2.d0*ReGSel-cf-ca-2.d0*cf*dlog(-tel/m2)
+c     & -2.d0*ca*dlog(-uel/m2)-(cf+ca)*dlog(mu**2/shel)
+c       c2minel=2.d0*ReGSin-cf-ca-2.d0*cf*dlog(-tinel/m2)
+c     & -2.d0*ca*dlog(-uinel/m2)-(cf+ca)*dlog(mu**2/sh)
+c
+c testing impact of c3m vs c2 etc
+       c2minel=0
+       c2mel=0
 c
 c MSbar NLL
       df1ds4inel=(c3m*lns4/ss4+c2minel/ss4)
