@@ -1,0 +1,17 @@
+# Atari 2600 (Stella) support for multiple assemblers
+# - DASM
+# - CC65
+
+# Assembled binaries and object directories
+obj/
+a.out
+*.bin
+*.a26
+*.x
+*.o 
+# Add in special Atari 7800-based binaries for good measure
+*.a78
+
+# Ignoring the data files, for now
+*.dat
+
