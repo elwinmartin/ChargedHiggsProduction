@@ -1,0 +1,7 @@
+born_mass_8.dat was created 7/5/2015 for the Born cross section of bbHW with 22 iterations, 200000 points, and a range of 216-1000 GeV. Tan Beta is 30, alpha is 1/128, m_t is 173 GeV. These will be consistent unless otherwise noted. These results were produced at 8 TeV, as well. 
+
+nlo_mass_8.dat is the nlo corrections to the above file.
+
+born_scale_8.dat is the above settings but varying scale from 0.1 to 10 m_H and with a m_H of 1 TeV.
+
+nlo_scale_8.dat is the nlo corrections to the above file. 

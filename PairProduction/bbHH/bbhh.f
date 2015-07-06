@@ -66,14 +66,14 @@ c      mq=mql(iloop)
                q2 = 4.d0*m2
        endif
 c-------mu dependence----------
-      m2 = mq*mq
-      do 510 iloop= 1,20
-       if (iloop .le. 10) then
-        q2l(iloop) =dble(iloop)/10.d0 
-         else
-        q2l(iloop)=dble(iloop)-10.d0
-       endif
-      q2=m2*(q2l(iloop))**2
+c      m2 = mq*mq
+c      do 510 iloop= 1,20
+c       if (iloop .le. 10) then
+c        q2l(iloop) =dble(iloop)/10.d0 
+c         else
+c        q2l(iloop)=dble(iloop)-10.d0
+c       endif
+c      q2=m2*(q2l(iloop))**2
 c------end of mu dep----------------
 c The above, lines 64 - 74 [ten lines ish] were originally commented out!!
          mu=dsqrt(q2)
@@ -423,8 +423,6 @@ c
        uel = u1el + m2
 c
        mq=dsqrt(m2)
-c       ReGSel=cf*dlog(-u1el/mq/dsqrt(shel))
-c     & +ca/2.d0*dlog(t1el/u1el)+ca/2.d0 
 c
        c3m=4.d0*cf
        c2mel=-2.d0*cf*dlog(-tel/m2)-2.d0*cf*dlog(mu**2/m2)
@@ -435,14 +433,14 @@ c
       c1mel=(dlog(-tel/m2)+dlog(-uel/m2)-3.d0/2.d0)
      & *dlog(mu**2/m2)*cf
 c
-      c1mel=0
-      c2mel=0      
+c      c1mel=0
+c      c2mel=0      
 c     
 c MSbar NLL
       f1=(c3m*lns4max**2/2.d0+c2mel*lns4max+c1mel)
      & *alfas/pi*sigb0         
 c
-c      print '(''df1ds4='',d20.7)',f1
+c     print '(''df1ds4='',d20.7)',alfas
 
 c
 c Computation of  surface term:
@@ -492,10 +490,6 @@ c
        uinel = u1 + m2        
 c
        mq=dsqrt(m2)
-c       ReGSel=cf*dlog(-u1el/mq/dsqrt(shel))
-c     & +ca/2.d0*dlog(t1el/u1el)+ca/2.d0 
-c       ReGSin=cf*dlog(-u1/mq/dsqrt(sh))
-c     & +ca/2.d0*dlog(t1/u1)+ca/2.d0
 c
        c3m=4.d0*cf
        c2mel=-2.d0*dlog(mu**2/m2)-2.d0*cf*dlog(m2/shel)
@@ -503,8 +497,8 @@ c
        c2minel=-2.d0*dlog(mu**2/m2)-2.d0*cf*dlog(m2/sh)
      & -2.d0*cf*dlog(-uinel/m2)-2.d0*cf*dlog(-tinel/m2)
 c
-       c2minel=0
-       c2mel=0
+c       c2minel=0
+c       c2mel=0
 c MSbar NLL
       df1ds4inel=(c3m*lns4/ss4+c2minel/ss4)
      & *alfas/pi*sigbs4
@@ -513,7 +507,7 @@ c
      & *alfas/pi*sigb0
 c
 c      print '(''df1ds4='',d20.7)',df1ds4inel
-c      print '(''df1ds4='',d20.7)',df1ds4inel
+c      print '(''df1ds4='',d20.7)',df1ds4el
 c
 c Computation of integral and surface term:
         int1=df1ds4inel*sfpartinel*hjacob
@@ -730,37 +724,31 @@ c
       c2w2=c2w*c2w
 c the c2w is cos (2theta2)
 c as if this doesn't evolve lolol
-      kg=0.1d0
-      ee=0.31333d0
       gg2=4.d0*pi*alfas
       alfa=1.d0/128.d0
       alfa2=alfa*alfa 
-      v=dsqrt(1-4.d0*m2/sh)
+      v=dsqrt(1.d0-4.d0*m2/sh)
       v3=v*v*v
       eq=-1.d0/3.d0
       Tl=-0.5d0
       cv=Tl-2.d0*q*sw2
       ca=Tl
-      tb=1.2d0
+      tb=30d0
       cb=1.d0/tb
 c uhhh about that alpha
 c    
       tm = t1 + m2
       um = u1 + m2
       mz2 = 91.1876d0*91.1876d0
-      mt=173.d0
-      mt2=mt*mt
-      mt4=mt2**2
-c      m2=80.385d0**2
 c
-      coef=pi/9.d0*alfa2*v3
+      coef1=pi/9.d0*alfa2*v3
       brkt=eq**2+0.5d0*eq*cv*c2w/sw2/cw2*sh/(sh-mz2) + 
      & 1.d0/16.d0*(cv2+ca2)*c2w2/sw4/cw4*sh**2/(sh-mz2)**2
 c
       mu=dsqrt(q2)
 c Matrix element squared
 c
-      Matrel2g=coef*brkt
+      Matrel2g=coef1*brkt
 c 
       qqdtdu = norm*Matrel2g/16.d0/pi/sh**2
 c     Normalization could be wrong!

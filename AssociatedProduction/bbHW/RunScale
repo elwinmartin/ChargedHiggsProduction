@@ -1,0 +1,4 @@
+#!/bin/sh
+gfortran -c -o bbhw_scale.o bbhw_scale.f
+gfortran -mips2 bbhw_scale.o vegas_en.o mstwpdf.o alphaS.o -o bbhw_scale.x
+./bbhw_scale.x

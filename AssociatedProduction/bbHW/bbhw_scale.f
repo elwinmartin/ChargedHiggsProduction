@@ -66,14 +66,14 @@ c      mq=mql(iloop)
                q2 = 4.d0*m2
        endif
 c-------mu dependence----------
-c      m2 = mq*mq
-c      do 510 iloop= 1,20
-c       if (iloop .le. 10) then
-c        q2l(iloop) =dble(iloop)/10.d0 
-c         else
-c        q2l(iloop)=dble(iloop)-10.d0
-c       endif
-c      q2=m2*(q2l(iloop))**2
+      m2 = mq*mq
+      do 510 iloop= 1,20
+       if (iloop .le. 10) then
+        q2l(iloop) =dble(iloop)/10.d0 
+         else
+        q2l(iloop)=dble(iloop)-10.d0
+       endif
+      q2=m2*(q2l(iloop))**2
 c------end of mu dep----------------
 c The above, lines 64 - 74 [ten lines ish] were originally commented out!!
          mu=dsqrt(q2)
@@ -100,7 +100,7 @@ c        out(2,iloop)=s1
       print'(''the ppbar correction:'',d20.8)',sigppb
       print'(''****** mq = '',d20.8)',mq
        write(7,*) r, sigppb 
-       write(8,*) mq, sigppb
+c       write(8,*) mq, sigppb
  510   continue
 c       write(10,1500) ((out(i,j),i=1,2),j=1,15)
 c       write(10,1500) ((out(i,j),i=1,2),j=1,11)
