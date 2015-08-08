@@ -378,7 +378,7 @@ c____________________________________________________________
 c
       parameter(pi=3.14159265359d0)       
 c
-      sigb0=qqdtdu(shel,m2,t1el,u1el)
+      sigb0=sigmas(shel,m2,t1el,u1el)
 c
 c      print '(''sigb0='',d20.7)',sigb0
 c
@@ -411,7 +411,7 @@ c
 c
       lns4max=dlog(s4max/m2)
 c Born piece
-      sigb0=qqdtdu(shel,m2,t1el,u1el)
+      sigb0=sigmas(shel,m2,t1el,u1el)
 c 
       ca=3.d0
       cf=4.d0/3.d0
@@ -425,23 +425,21 @@ c
        mq=dsqrt(m2)
 c
        c3m=4.d0*cf
-       c2mel=-2.d0*cf*dlog(-tel/m2)-2.d0*cf*dlog(mu**2/m2)
-     & -2.d0*ca*dlog(-uel/m2)-2.d0*cf*dlog(m2/shel)
+       c2mel=-2.d0*cf*dlog(-t1el/m2)-2.d0*cf*dlog(mu**2/m2)
+     & -2.d0*cf*dlog(-u1el/m2)-2.d0*cf*dlog(m2/shel)
 c
 c The NNLL MSbar \delta(s_4) term
 c
-      c1mel=(dlog(-tel/m2)+dlog(-uel/m2)-3.d0/2.d0)
+c   so tel is actually tel, I need -tel + m2 
+c   = -t1el -m2 + m2 = -t1el...etc. weird but whatever.
+      c1mel=(dlog(-t1el/m2)+dlog(-u1el/m2)-3.d0/2.d0)
      & *dlog(mu**2/m2)*cf
 c
-c      c1mel=0
-c      c2mel=0      
-c     
 c MSbar NLL
       f1=(c3m*lns4max**2/2.d0+c2mel*lns4max+c1mel)
      & *alfas/pi*sigb0         
 c
-c     print '(''df1ds4='',d20.7)',alfas
-
+c      print '(''lns4max='',d20.7)',lns4max
 c
 c Computation of  surface term:
       s6=f1
@@ -480,8 +478,8 @@ c
       cf=4.d0/3.d0
       betaz=(11.d0*ca-2.d0*nf)/3.d0
 c Born piece
-      sigbs4=qqdtdu(sh,m2,t1,u1)
-      sigb0=qqdtdu(shel,m2,t1el,u1el)
+      sigbs4=sigmas(sh,m2,t1,u1)
+      sigb0=sigmas(shel,m2,t1el,u1el)
 c
 c
        tel = t1el + m2
@@ -493,12 +491,10 @@ c
 c
        c3m=4.d0*cf
        c2mel=-2.d0*dlog(mu**2/m2)-2.d0*cf*dlog(m2/shel)
-     & -2.d0*cf*dlog(-uel/m2)-2.d0*cf*dlog(-tel/m2)
+     & -2.d0*cf*dlog(-u1el/m2)-2.d0*cf*dlog(-t1el/m2)
        c2minel=-2.d0*dlog(mu**2/m2)-2.d0*cf*dlog(m2/sh)
-     & -2.d0*cf*dlog(-uinel/m2)-2.d0*cf*dlog(-tinel/m2)
+     & -2.d0*cf*dlog(-u1/m2)-2.d0*cf*dlog(-t1/m2)
 c
-c       c2minel=0
-c       c2mel=0
 c MSbar NLL
       df1ds4inel=(c3m*lns4/ss4+c2minel/ss4)
      & *alfas/pi*sigbs4
@@ -512,11 +508,7 @@ c
 c Computation of integral and surface term:
         int1=df1ds4inel*sfpartinel*hjacob
      &   -df1ds4el*sfpartel*ejacob
-cnk      print '(''sfpartinel='',d20.7)',sfpartinel
-cnk      print '(''sfpartel='',d20.7)',sfpartel
-c      print '(''int1='',d20.7)',int1
 c
-cnk      print '(''coef='',d20.7)',coef
       s6=int1
 c
       RETURN 
@@ -543,7 +535,7 @@ c
 c
       lns4max=dlog(s4max/m2)
 c Born piece
-      sigb0=qqdtdu(shel,m2,t1el,u1el)
+      sigb0=sigmas(shel,m2,t1el,u1el)
 c
       cf=4.d0/3.d0 
       ca=3.d0
@@ -559,33 +551,29 @@ c
        uel = u1el + m2
 c
        mq=dsqrt(m2)
-       ReGSel=cf*dlog(-u1el/mq/dsqrt(shel))
-     & +ca/2.d0*dlog(t1el/u1el)+ca/2.d0 
 c
-       c3m=2.d0*(cf+ca)
-       c2mel=2.d0*ReGSel-cf-ca-2.d0*cf*dlog(-tel/m2)
-     & -2.d0*ca*dlog(-uel/m2)-(cf+ca)*dlog(mu**2/shel)
-       T2mel=c2mel+(cf+ca)*dlog(mu**2/m2)
+       c3m=4.d0*cf
+       c2mel=-2.d0*cf*dlog(mu**2/m2)
+       T2mel=-2.d0*cf*(dlog(-u1el/m2) + dlog(-t1el/m2) + dlog(m2/shel))
+       c2el=c2mel+T2mel
 c
 c The NNLL MSbar \delta(s_4) term
 c
-      c1mel=(cf*dlog(-tel/m2)+ca*dlog(-uel/m2)-3.d0/4.d0*cf)
-     & *dlog(mu**2/m2)
+      c1mel=(dlog(-t1el/m2)+dlog(-u1el/m2)-3.d0/2.d0)
+     & *dlog(mu**2/m2)*cf
 c
 c MSbar NLL
       f2=c3m**2/2.d0*lns4max**4/4.d0
-     & +(3.d0/2.d0*c3m*c2mel-betaz/4.d0*c3m)
+     & +(3.d0/2.d0*c3m*c2el-betaz/4.d0*c3m)
      & *lns4max**3/3.d0
 c scale+zeta NNLL terms
-     & +lns4max**2/2.d0*(c3m*c1mel+(cf+ca)**2
-     & *(dlog(mu**2/m2))**2-2.d0*(cf+ca)*T2mel*dlog(mu**2/m2)
-     & +betaz/4.d0*c3m*dlog(mu**2/m2)
+     & +lns4max**2/2.d0*(c3m*c1mel + c2mel**2 + betaz*c3m/4.0d0
+     & *dlog(mu**2/m2) + 2.d0*c2mel*T2mel
      & -zeta2*c3m**2)
 c log^2(scale)+zeta 1/s4 terms
-     & +lns4max*(-(cf+ca)*dlog(mu**2/m2)*c1mel
-     & -betaz/4.d0*(cf+ca)*(dlog(mu**2/m2))**2
-     & +(cf+ca)*betaz/8.d0*(dlog(mu**2/m2))**2
-     & -zeta2*c2mel*c3m+zeta3*c3m**2)
+     & + lns4max*(c2mel*c1mel - zeta2*c3m*c2el
+     & + betaz/4.d0*c2mel*dlog(mu**2/m2)
+     & + cf*betaz/4.d0*(dlog(mu**2/m2))**2)
 c Computation of integral and surface term:
 c
       s7 =coef*coef*f2*sigb0
@@ -619,8 +607,8 @@ c
       lns4=dlog(ss4/m2)
 c
 c Born piece
-      sigbs4=qqdtdu(sh,m2,t1,u1)
-      sigb0=qqdtdu(shel,m2,t1el,u1el)
+      sigbs4=sigmas(sh,m2,t1,u1)
+      sigb0=sigmas(shel,m2,t1el,u1el)
 c
       cf=4.d0/3.d0
       ca=3.d0
@@ -636,57 +624,52 @@ c
        uel = u1el + m2
 c
        mq=dsqrt(m2)
-       ReGSel=cf*dlog(-u1el/mq/dsqrt(shel))
-     & +ca/2.d0*dlog(t1el/u1el)+ca/2.d0 
-       ReGSin=cf*dlog(-u1/mq/dsqrt(sh))
-     & +ca/2.d0*dlog(t1/u1)+ca/2.d0
 c
-       c3m=2.d0*(cf+ca)
-       c2mel=2.d0*ReGSel-cf-ca-2.d0*cf*dlog(-tel/m2)
-     & -2.d0*ca*dlog(-uel/m2)-(cf+ca)*dlog(mu**2/shel)
-       T2mel=c2mel+(cf+ca)*dlog(mu**2/m2)
-       c2minel=2.d0*ReGSin-cf-ca-2.d0*cf*dlog(-tinel/m2)
-     & -2.d0*ca*dlog(-uinel/m2)-(cf+ca)*dlog(mu**2/sh)
-       T2minel=c2minel+(cf+ca)*dlog(mu**2/m2)     
+       c3m=4.d0*cf
 c
-c The NNLL MSbar inelastic \delta(s_4) term
+       c2mel=-2.d0*cf*dlog(mu**2/m2)
+       T2mel=-2.d0*cf*(dlog(-u1el/m2) + dlog(-t1el/m2) + dlog(m2/shel))
+       c2minel=-2.d0*cf*dlog(mu**2/m2)
+       T2minel=-2.d0*cf*(dlog(-u1/m2) +
+     & dlog(-t1/m2) + dlog(m2/sh))
+       c2el=c2mel+T2mel
+       c2inel=c2minel+T2minel
 c
-      c1minel=(cf*dlog(-tinel/m2)+ca*dlog(-uinel/m2)-3.d0/4.d0*cf)
-     & *dlog(mu**2/m2)
 c The NNLL MSbar elastic \delta(s_4) term
-c
-      c1mel=(cf*dlog(-tel/m2)+ca*dlog(-uel/m2)-3.d0/4.d0*cf)
-     & *dlog(mu**2/m2)
+      c1minel=(dlog(-t1/m2)+dlog(-u1/m2)-3.d0/2.d0)
+     & *dlog(mu**2/m2)*cf
+      c1mel=(dlog(-t1el/m2)+dlog(-u1el/m2)-3.d0/2.d0)
+     & *dlog(mu**2/m2)*cf
 c
 c MSbar NLL
       df2ds4inel=c3m**2/2.d0*lns4**3/ss4
-     & +(3.d0/2.d0*c3m*c2minel-betaz/4.d0*c3m)
+     & + (3.d0/2.d0*c3m*c2inel - betaz/4.d0*c3m)
      & *lns4**2/ss4
-c scale+zeta NNLL terms
-     & +lns4/ss4*(c3m*c1minel+(cf+ca)**2
-     & *(dlog(mu**2/m2))**2-2.d0*(cf+ca)*T2minel*dlog(mu**2/m2)
+c scale+zeta NNLL terms above is correct.
+     & +lns4/ss4*(c3m*c1minel+c2minel**2
+     & +2.d0*c2minel*T2minel
      & +betaz/4.d0*c3m*dlog(mu**2/m2)
      & -zeta2*c3m**2)
-c log^2(scale)+zeta 1/s4 terms
-     & +1.d0/ss4*(-(cf+ca)*dlog(mu**2/m2)*c1minel
-     & -betaz/4.d0*(cf+ca)*(dlog(mu**2/m2))**2
-     & +(cf+ca)*betaz/8.d0*(dlog(mu**2/m2))**2
-     & -zeta2*c2minel*c3m+zeta3*c3m**2)
-c
+c log^2(scale)+zeta 1/s4 terms, above is fixed
+     & +1.d0/ss4*(c2minel*c1minel
+     & +c2minel*betaz/4.d0*dlog(mu**2/m2)
+     & +cf*betaz/4.d0*(dlog(mu**2/m2))**2
+     & -zeta2*c2inel*c3m+zeta3*c3m**2)
+c inelastic part is fixed
       df2ds4el=c3m**2/2.d0*lns4**3/ss4
-     & +(3.d0/2.d0*c3m*c2mel-betaz/4.d0*c3m)
+     & +(3.d0/2.d0*c3m*c2el-betaz/4.d0*c3m)
      & *lns4**2/ss4
 c scale+zeta NNLL terms
-     & +lns4/ss4*(c3m*c1mel+(cf+ca)**2
-     & *(dlog(mu**2/m2))**2-2.d0*(cf+ca)*T2mel*dlog(mu**2/m2)
+     & +lns4/ss4*(c3m*c1mel+c2mel**2
+     & +2.d0*c2mel*T2mel
      & +betaz/4.d0*c3m*dlog(mu**2/m2)
      & -zeta2*c3m**2)
 c log^2(scale)+zeta 1/s4 terms
-     & +1.d0/ss4*(-(cf+ca)*dlog(mu**2/m2)*c1mel
-     & -betaz/4.d0*(cf+ca)*(dlog(mu**2/m2))**2
-     & +(cf+ca)*betaz/8.d0*(dlog(mu**2/m2))**2
+     & +1.d0/ss4*(c2mel*c1mel
+     & +c2mel*betaz/4.d0*dlog(mu**2/m2)
+     & +cf*betaz/4.d0*(dlog(mu**2/m2))**2
      & -zeta2*c2mel*c3m+zeta3*c3m**2)
-c
+c fixed elastic bits, I think`
 c Computation of integral and surface term:
        int1=df2ds4inel*sfpartinel*hjacob*sigbs4
      &  -df2ds4el*sfpartel*ejacob*sigb0
@@ -698,7 +681,7 @@ C
 c
 c_______________________________________________________________________
 c***********************************************************
-      double precision function qqdtdu(sh,m2,t1,u1)
+      double precision function sigmas(sh,m2,t1,u1)
       implicit double precision(a-z)
 c
       PARAMETER( PI = 3.14159265359D0)
@@ -746,15 +729,29 @@ c
      & 1.d0/16.d0*(cv2+ca2)*c2w2/sw4/cw4*sh**2/(sh-mz2)**2
 c
       mu=dsqrt(q2)
-c Matrix element squared
 c
-      Matrel2g=coef1*brkt
+      mzs=mz2-sh
+      dv=-2.d0*m2/v/sh**2
+      ddv=-4.d0*m2*(-3.d0*m2+sh)/v/(sh-4.d0*m2)/sh**3
+      c1=pi/9.d0*alfa2
+      c2=eq**2
+      c3=0.5d0*eq*cv*c2w/sw2/cw2
+      c4=1.d0/16.d0*(cv2+ca2)*c2w2/sw4/cw4
+      v2=2.d0*(c2*(mz2-sh)**4+sh**3*(mz2*(2*c4-c3)+(c3+c4)*sh))
+      v1v1=6*(mz2-sh)**2*sh**2*(c2*(mz2-sh)**2+sh*(sh*(c3+c4)-c3*mz2))
+      v01=dv
+      v10=dv
+      v11=ddv
+      ds=(c1*v*(2*(c2*mzs**4 + (-c3 + 2*c4)*mzs*sh**3 + 3*c4*sh**4)*v**2
+     - + 6*mzs**2*sh**2*(c4*sh**2 + mzs*(c2*mzs - c3*sh))*v01*v10 + 
+     -3*mzs*sh*v*((c2*mzs**3 - (-c3 + c4)*mzs*sh**2 - 2*c4*sh**3)*v01 - 
+     -  (-(c2*mzs**3) + (-c3 + c4)*mzs*sh**2 + 2*c4*sh**3)*v10 + 
+     -  mzs*sh*(c2*mzs**2 - c3*msz*sh + c4*sh**2)*v11)))/(mzs**4*sh**3)
+c
 c 
-      qqdtdu = norm*Matrel2g/16.d0/pi/sh**2
-c     Normalization could be wrong!
-
+      sigmas = norm*ds
 c
-c      print '(''qqdtdu='',d20.7)',m2
+c     Normalization could be wrong!
 c
       return
       end

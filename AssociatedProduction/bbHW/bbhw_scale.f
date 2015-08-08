@@ -100,7 +100,7 @@ c        out(2,iloop)=s1
       print'(''the ppbar correction:'',d20.8)',sigppb
       print'(''****** mq = '',d20.8)',mq
        write(7,*) r, sigppb 
-c       write(8,*) mq, sigppb
+       write(8,*) mq, sigppb
  510   continue
 c       write(10,1500) ((out(i,j),i=1,2),j=1,15)
 c       write(10,1500) ((out(i,j),i=1,2),j=1,11)
@@ -417,6 +417,7 @@ c
       ca=3.d0
       cf=4.d0/3.d0
       betaz=(11.d0*ca-2.d0*nf)/3.d0
+      MW2=80.385d0**2
 c
       zeta2=pi*pi/6.d0
 c
@@ -425,19 +426,22 @@ c temporary
 c       tel =ABS(tel)
        uel = u1el + m2
 c
+       twel=tel-MW2
+       uwel=uel-MW2
+c
        mq=dsqrt(m2)
 c       ReGSel=cf*dlog(-u1el/mq/dsqrt(shel))
 c     & +ca/2.d0*dlog(t1el/u1el)+ca/2.d0 
 c c3 is good
        c3m=4.d0*cf
        c2mel=-2.d0*cf*dlog(mu**2/m2)-2.d0*cf*dlog(m2/shel)
-     & -2.d0*cf*dlog(-uel/m2)-2.d0*dlog(-tel/m2)
+     & -2.d0*cf*dlog(-uwel/m2)-2.d0*dlog(-twel/m2)
 c
 c The minus sign should be checked
 c
 c The NNLL MSbar \delta(s_4) term
 c
-      c1mel=(dlog(-tel/m2)+dlog(-uel/m2)-3.d0/2.d0)
+      c1mel=(dlog(-twel/m2)+dlog(-uwel/m2)-3.d0/2.d0)
      & *dlog(mu**2/m2)*cf
 c
 c toying with the code
@@ -446,7 +450,7 @@ c      c2mel=0
 c MSbar NLL
       f1=(c3m*lns4max**2/2.d0+c2mel*lns4max+c1mel)
      & *alfas/pi*sigb0         
-c      print '(''f1='',d20.7)',f1
+      print '(''f1='',d20.7)',f1
 
 c
 c Computation of  surface term:
@@ -489,11 +493,17 @@ c Born piece
       sigbs4=qqdtdu(sh,m2,t1,u1)
       sigb0=qqdtdu(shel,m2,t1el,u1el)
 c
+       MW2=80.385d0**2
 c
        tel = t1el + m2
        uel = u1el + m2       
        tinel = t1 + m2
        uinel = u1 + m2        
+c
+       twel=tel-MW2
+       uwel=uel-MW2
+       twinel=tinel-MW2
+       uwinel=uinel-MW2
 c
        mq=dsqrt(m2)
 c       ReGSel=cf*dlog(-u1el/mq/dsqrt(shel))
@@ -503,9 +513,9 @@ c     & +ca/2.d0*dlog(t1/u1)+ca/2.d0
 c
        c3m=4.d0*cf
        c2mel=-2.d0*cf*dlog(mu**2/m2)-2.d0*cf*dlog(m2/shel)
-     & -2.d0*cf*dlog(-uel/m2)-2.d0*dlog(-tel/m2)
+     & -2.d0*cf*dlog(-uwel/m2)-2.d0*dlog(-twel/m2)
        c2minel=-2.d0*cf*dlog(mu**2/m2)-2.d0*cf*dlog(m2/sh)
-     & -2.d0*cf*dlog(-uinel/m2)-2.d0*dlog(-tinel/m2)
+     & -2.d0*cf*dlog(-uwinel/m2)-2.d0*dlog(-twinel/m2)
 cc
 c
 c       c3m=2.d0*(cf+ca)
@@ -531,7 +541,7 @@ c Computation of integral and surface term:
      &   -df1ds4el*sfpartel*ejacob
 cnk      print '(''sfpartinel='',d20.7)',sfpartinel
 cnk      print '(''sfpartel='',d20.7)',sfpartel
-cnk      print '(''int1='',d20.7)',int1
+c      print '(''int1='',d20.7)',int1
 c
 cnk      print '(''coef='',d20.7)',coef
       s6=int1
@@ -571,40 +581,45 @@ c
       zeta2=pi*pi/6.d0
       zeta3=1.2020569031d0
       zeta4=1.0823232337d0
+      MW2=80.385d0**2
 c
        tel = t1el + m2
        uel = u1el + m2
 c
-       mq=dsqrt(m2)
-       ReGSel=cf*dlog(-u1el/mq/dsqrt(shel))
-     & +ca/2.d0*dlog(t1el/u1el)+ca/2.d0 
+       twel=tel-MW2
+       uwel=uel-MW2
 c
-       c3m=2.d0*(cf+ca)
-       c2mel=2.d0*ReGSel-cf-ca-2.d0*cf*dlog(-tel/m2)
-     & -2.d0*ca*dlog(-uel/m2)-(cf+ca)*dlog(mu**2/shel)
-       T2mel=c2mel+(cf+ca)*dlog(mu**2/m2)
+       mq=dsqrt(m2)
+c       ReGSel=cf*dlog(-u1el/mq/dsqrt(shel))
+c     & +ca/2.d0*dlog(t1el/u1el)+ca/2.d0 
+c
+       c3m=4.d0*cf
+       c2mel=-2.d0*cf*dlog(mu**2/m2)
+       T2mel=-2.d0*cf*(dlog(-uwel/m2) + dlog(-twel/m2) + dlog(m2/shel))
+       c2el=c2mel+T2mel
 c
 c The NNLL MSbar \delta(s_4) term
 c
-      c1mel=(cf*dlog(-tel/m2)+ca*dlog(-uel/m2)-3.d0/4.d0*cf)
-     & *dlog(mu**2/m2)
+      c1mel=(dlog(-twel/m2)+dlog(-uwel/m2)-3.d0/2.d0)
+     & *dlog(mu**2/m2)*cf
+c      c1mel=(cf*dlog(-tel/m2)+ca*dlog(-uel/m2)-3.d0/4.d0*cf)
+c     & *dlog(mu**2/m2)
 c
 c MSbar NLL
       f2=c3m**2/2.d0*lns4max**4/4.d0
-     & +(3.d0/2.d0*c3m*c2mel-betaz/4.d0*c3m)
+     & +(3.d0/2.d0*c3m*c2el-betaz/4.d0*c3m)
      & *lns4max**3/3.d0
 c scale+zeta NNLL terms
-     & +lns4max**2/2.d0*(c3m*c1mel+(cf+ca)**2
-     & *(dlog(mu**2/m2))**2-2.d0*(cf+ca)*T2mel*dlog(mu**2/m2)
-     & +betaz/4.d0*c3m*dlog(mu**2/m2)
+     & +lns4max**2/2.d0*(c3m*c1mel + c2mel**2 + betaz*c3m/4.0d0
+     & *dlog(mu**2/m2) + 2.d0*c2mel*T2mel
      & -zeta2*c3m**2)
 c log^2(scale)+zeta 1/s4 terms
-     & +lns4max*(-(cf+ca)*dlog(mu**2/m2)*c1mel
-     & -betaz/4.d0*(cf+ca)*(dlog(mu**2/m2))**2
-     & +(cf+ca)*betaz/8.d0*(dlog(mu**2/m2))**2
-     & -zeta2*c2mel*c3m+zeta3*c3m**2)
+     & + lns4max*(c2mel*c1mel - zeta2*c3m*c2el
+     & + betaz/4.d0*c2mel*dlog(mu**2/m2)
+     & + cf*betaz/4.d0*(dlog(mu**2/m2))**2)
 c Computation of integral and surface term:
 c
+c      print '(''qqdtdu='',d20.7)',f2
       s7 =coef*coef*f2*sigb0
 C
       RETURN 
@@ -647,67 +662,92 @@ c
       zeta2=pi*pi/6.d0 
       zeta3=1.2020569031d0
 c
-       tinel = t1 + m2
-       uinel = u1 + m2
+c       tinel = t1 + m2
+c       uinel = u1 + m2
+c       tel = t1el + m2
+c       uel = u1el + m2
+c
+       MW2=80.385d0**2
+c
        tel = t1el + m2
-       uel = u1el + m2
+       uel = u1el + m2       
+       tinel = t1 + m2
+       uinel = u1 + m2        
+c
+       twel=tel-MW2
+       uwel=uel-MW2
+       twinel=tinel-MW2
+       uwinel=uinel-MW2
 c
        mq=dsqrt(m2)
-       ReGSel=cf*dlog(-u1el/mq/dsqrt(shel))
-     & +ca/2.d0*dlog(t1el/u1el)+ca/2.d0 
-       ReGSin=cf*dlog(-u1/mq/dsqrt(sh))
-     & +ca/2.d0*dlog(t1/u1)+ca/2.d0
+c       ReGSel=cf*dlog(-u1el/mq/dsqrt(shel))
+c     & +ca/2.d0*dlog(t1el/u1el)+ca/2.d0 
+c       ReGSin=cf*dlog(-u1/mq/dsqrt(sh))
+c     & +ca/2.d0*dlog(t1/u1)+ca/2.d0
 c
-       c3m=2.d0*(cf+ca)
-       c2mel=2.d0*ReGSel-cf-ca-2.d0*cf*dlog(-tel/m2)
-     & -2.d0*ca*dlog(-uel/m2)-(cf+ca)*dlog(mu**2/shel)
-       T2mel=c2mel+(cf+ca)*dlog(mu**2/m2)
-       c2minel=2.d0*ReGSin-cf-ca-2.d0*cf*dlog(-tinel/m2)
-     & -2.d0*ca*dlog(-uinel/m2)-(cf+ca)*dlog(mu**2/sh)
-       T2minel=c2minel+(cf+ca)*dlog(mu**2/m2)     
+       c3m=4.d0*cf
+c       c2mel=-2.d0*cf*dlog(mu**2/m2)-2.d0*cf*dlog(m2/shel)
+c     & -2.d0*cf*dlog(-uwel/m2)-2.d0*dlog(-twel/m2)
+c       c2minel=-2.d0*cf*dlog(mu**2/m2)-2.d0*cf*dlog(m2/sh)
+c     & -2.d0*cf*dlog(-uwinel/m2)-2.d0*dlog(-twinel/m2)
+c     & -2.d0*ca*dlog(-uel/m2)-(cf+ca)*dlog(mu**2/shel)
+cc       T2mel=c2mel+(cf+ca)*dlog(mu**2/m2)
+c       c2minel=2.d0*ReGSin-cf-ca-2.d0*cf*dlog(-tinel/m2)
+c     & -2.d0*ca*dlog(-uinel/m2)-(cf+ca)*dlog(mu**2/sh)
+c       T2minel=c2minel+(cf+ca)*dlog(mu**2/m2)     
 c
 c The NNLL MSbar inelastic \delta(s_4) term
+       c2mel=-2.d0*cf*dlog(mu**2/m2)
+       T2mel=-2.d0*cf*(dlog(-uwel/m2) + dlog(-twel/m2) + dlog(m2/shel))
+       c2minel=-2.d0*cf*dlog(mu**2/m2)
+       T2minel=-2.d0*cf*(dlog(-uwinel/m2) +
+     & dlog(-twinel/m2) + dlog(m2/sh))
+       c2el=c2mel+T2mel
+       c2inel=c2minel+T2minel
 c
-      c1minel=(cf*dlog(-tinel/m2)+ca*dlog(-uinel/m2)-3.d0/4.d0*cf)
-     & *dlog(mu**2/m2)
 c The NNLL MSbar elastic \delta(s_4) term
+      c1minel=(dlog(-twinel/m2)+dlog(-uwinel/m2)-3.d0/2.d0)
+     & *dlog(mu**2/m2)*cf
 c
-      c1mel=(cf*dlog(-tel/m2)+ca*dlog(-uel/m2)-3.d0/4.d0*cf)
-     & *dlog(mu**2/m2)
+c      c1mel=(cf*dlog(-tel/m2)+ca*dlog(-uel/m2)-3.d0/4.d0*cf)
+c     & *dlog(mu**2/m2)
 c
+      c1mel=(dlog(-twel/m2)+dlog(-uwel/m2)-3.d0/2.d0)
+     & *dlog(mu**2/m2)*cf
 c MSbar NLL
       df2ds4inel=c3m**2/2.d0*lns4**3/ss4
-     & +(3.d0/2.d0*c3m*c2minel-betaz/4.d0*c3m)
+     & + (3.d0/2.d0*c3m*c2inel - betaz/4.d0*c3m)
      & *lns4**2/ss4
-c scale+zeta NNLL terms
-     & +lns4/ss4*(c3m*c1minel+(cf+ca)**2
-     & *(dlog(mu**2/m2))**2-2.d0*(cf+ca)*T2minel*dlog(mu**2/m2)
+c scale+zeta NNLL terms above is correct.
+     & +lns4/ss4*(c3m*c1minel+c2minel**2
+     & +2.d0*c2minel*T2minel
      & +betaz/4.d0*c3m*dlog(mu**2/m2)
      & -zeta2*c3m**2)
-c log^2(scale)+zeta 1/s4 terms
-     & +1.d0/ss4*(-(cf+ca)*dlog(mu**2/m2)*c1minel
-     & -betaz/4.d0*(cf+ca)*(dlog(mu**2/m2))**2
-     & +(cf+ca)*betaz/8.d0*(dlog(mu**2/m2))**2
-     & -zeta2*c2minel*c3m+zeta3*c3m**2)
-c
+c log^2(scale)+zeta 1/s4 terms, above is fixed
+     & +1.d0/ss4*(c2minel*c1minel
+     & +c2minel*betaz/4.d0*dlog(mu**2/m2)
+     & +cf*betaz/4.d0*(dlog(mu**2/m2))**2
+     & -zeta2*c2inel*c3m+zeta3*c3m**2)
+c inelastic part is fixed
       df2ds4el=c3m**2/2.d0*lns4**3/ss4
-     & +(3.d0/2.d0*c3m*c2mel-betaz/4.d0*c3m)
+     & +(3.d0/2.d0*c3m*c2el-betaz/4.d0*c3m)
      & *lns4**2/ss4
 c scale+zeta NNLL terms
-     & +lns4/ss4*(c3m*c1mel+(cf+ca)**2
-     & *(dlog(mu**2/m2))**2-2.d0*(cf+ca)*T2mel*dlog(mu**2/m2)
+     & +lns4/ss4*(c3m*c1mel+c2mel**2
+     & +2.d0*c2mel*T2mel
      & +betaz/4.d0*c3m*dlog(mu**2/m2)
      & -zeta2*c3m**2)
 c log^2(scale)+zeta 1/s4 terms
-     & +1.d0/ss4*(-(cf+ca)*dlog(mu**2/m2)*c1mel
-     & -betaz/4.d0*(cf+ca)*(dlog(mu**2/m2))**2
-     & +(cf+ca)*betaz/8.d0*(dlog(mu**2/m2))**2
+     & +1.d0/ss4*(c2mel*c1mel
+     & +c2mel*betaz/4.d0*dlog(mu**2/m2)
+     & +cf*betaz/4.d0*(dlog(mu**2/m2))**2
      & -zeta2*c2mel*c3m+zeta3*c3m**2)
-c
+c fixed elastic bits, I think`
 c Computation of integral and surface term:
        int1=df2ds4inel*sfpartinel*hjacob*sigbs4
      &  -df2ds4el*sfpartel*ejacob*sigb0
 c
+c      print '(''test='',d20.7)',df2ds4inel
       s7 =coef*coef*(int1)
 C
       RETURN 
@@ -760,6 +800,7 @@ c
       um = u1 + m2
       mz2 = 91.1876d0*91.1876d0
       mt=173.d0
+      mt2=mt**2
       mt4=mt**4
       MW2=80.385d0**2
 c
@@ -781,11 +822,42 @@ c fixed sw4
       brk2=(1.d0-(MW2+m2)/sh)**2-4.d0*MW2*m2/sh**2
       Matrel2g=coef*brk1*dsqrt(brk2)
 c  
+      c1=pi*alfa2*mt4*cb**2/96.d0/sw4/MW2
+c
       qqdtdu = norm*Matrel2g/16.d0/pi/sh**2
 c       qqdtdu = norm*Matrel2g/sh**2
-
+c      dq= (2*c1*(2*m2**4*mw2**2*(3*(mt2 + tm) - 2*um) + 
+c     -(tm + um)**3*(2*mw2**4 + tm**3*(tm + um) 
+c     -   + mt2*(mw2 - tm)*(mw2 - um)*(2*mw2 + tm + um) - 
+c     -     2*mw2**3*(3*tm + 2*um) - mw2*tm*(tm**2 + 4*tm*um + um**2) + 
+c     -     mw2**2*(4*tm**2 + 7*tm*um + 2*um**2)) - m2**3*mw2*(-32*mw2**3
+c     - + 8*mw2**2*tm + 24*mw2*tm**2 + tm**3 + 3*(-4*mw2 + tm)**2*um + 
+c     -         (-16*mw2 + 3*tm)*um**2 - um**3 + 
+c     -2*mt2*(4*mw2**2 + 3*tm**2 + 7*tm*um + 3*um**2 - 4*mw2*(tm + um))) 
+c     - + m2**2*(32*mw2**5 + tm*um*(tm + um)**3 - 14*mw2**4*(7*tm + 6*um)
+c     -  + 2*mw2**2*tm*(7*tm**2 - 28*tm*um - 13*um**2) + 
+c     -    4*mw2**3*(11*tm**2 + 33*tm*um + 14*um**2) + 
+c     -    4*mw2*(2*tm**4 + 4*tm**3*um - 3*tm*um**3 - um**4) + 
+c     -      mt2*(30*mw2**4 - 20*mw2**3*(tm + um) + (tm + um)**4 + 
+c     -    4*mw2*(tm + um)*(tm**2 + tm*um + um**2)  -
+c     -    2*mw2**2*(7*tm**2 - 8*tm*um + 7*um**2))) - 
+c     -      m2*(4*mw2**5*(tm + 2*um) - 4*mw2**4*(tm + um)*(tm + 2*um) + 
+c     -      tm*(tm + um)**3*(tm**2 + 4*tm*um + um**2) + 
+c     -mw2*(tm + um)**2*(4*tm**3 - 27*tm**2*um - 16*tm*um**2 - 3*um**3) +
+c     -2*mw2**2*(tm + um)*(9*tm**3 + 28*tm**2*um + 29*tm*um**2 + 8*um**3)
+c     - - mw2**3*(23*tm**3 + 57*tm**2*um + 45*tm*um**2 + 13*um**3) + 
+c     - mt2*(4*mw2**5 - 4*mw2**4*(tm + um) + (tm + um)**3*(tm**2 + um**2)
+c     -    - mw2*(tm + um)**2*(tm**2 - 16*tm*um + um**2) - 
+c     -    2*mw2**2*(tm + um)*(9*tm**2 + 16*tm*um + 9*um**2) + 
+c     -  2*mw2**3*(9*tm**2 + 19*tm*um + 9*um**2)))))/
+c     -  (mw2*sh**5*(-mt2 + tm)**3*(4*m2*mw2 
+c     - - (tm + um)**2)*Sqrt((-4*m2*mw2 + (tm + um)**2)/sh**2))
+      dq=(2*c1*Sqrt(-4*mh2*mw2 + (tm + um)**2)*(2*mw2**2 
+     &- 2*mw2*(tm + um) + tm*(sh + 2*um)))/
+     - (mw2*sh**4*(mt2 - tm)**2*Sqrt((-4*mh2*mw2 + (tm + um)**2)/sh**2))
+      qqdtdu=norm*dq
 c
-c      print '(''qqdtdu='',d20.7)',MW2
+c      print '(''qqdtdu='',d20.7)',dq
 c
       return
       end
