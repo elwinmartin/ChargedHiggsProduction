@@ -11,13 +11,13 @@ c-----------------------------------------------------------
       dimension out(2,0:20)
       common/result/s1,s2,s3,s4
       common/cross/scap
-      common/mass2/m2
+      common/mass2/m2,tb
       common/qcdpar/q2,qcdl4
       common/parone/norder
       common/partwo/nf
       common/pdfalfa/alfas
       common/pdfmstw/isetmstw
-
+c      common tb
 c
       parameter(pi=3.14159265359d0)
 c                                                                     
@@ -40,6 +40,7 @@ c
       read(11,*)mq
       read(11,*)qcdl4
       read(11,*)nscale
+      read(11,*)tb
 c
       print '(''number of points :'',i7)',pts
       print '(''number of iterations :'',i7)',its
@@ -49,6 +50,7 @@ c
       print '(''charged higgs mass:'',d20.7)',mq
       print '(''qcdl4:'',d20.7)',qcdl4
       print '(''scale (1)m (0)m/2 (2)2m:'',i2)',nscale
+c      print '(''tan beta:'',d20.7)',tb
 c
       scap = srcaps*srcaps
 c
@@ -101,7 +103,7 @@ c        out(2,iloop)=s1
       print'(''****** mq = '',d20.8)',mq
        write(7,*) r, sigppb 
        write(8,*) mq, sigppb
- 510   continue
+c 510   continue
 c       write(10,1500) ((out(i,j),i=1,2),j=1,15)
 c       write(10,1500) ((out(i,j),i=1,2),j=1,11)
 c       write(10,1500) ((out(i,j),i=1,2),j=1,20)
@@ -124,7 +126,7 @@ c- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       dimension x(10)
       common/result/s1,s2,s3,s4
       common/cross/scap
-      common/mass2/m2
+      common/mass2/m2,tb
       common/qcdpar/q2,qcdl4
       common/parone/norder
       common/partwo/nf
@@ -135,7 +137,7 @@ c- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 c
       parameter(pi=3.14159265359d0)
 c
-       SS = scap	 
+       SS = scap 
        mu=dsqrt(q2)
 c
 c we do the integrals in the order T,U,xb,s2 
@@ -143,7 +145,6 @@ c
 c Definition of the integration variables
 c
       MW2 = 80.385d0*80.385d0
-c This is a placeholder mass, clearly
 c
       Tmax = m2-1.d0/2.d0*(SS+m2-MW2)
      & +1.d0/2.d0*dsqrt((SS+m2-MW2)**2-4.d0*m2*SS)
@@ -208,7 +209,7 @@ c----------------------------------------------------------------------
 c
       double precision function aptel(s4max,m2,xa,xb)
       implicit double precision(a-z)
-      integer norder, iset, npp
+      integer norder, iset 
       common/parone/norder      
       common/qcdpar/q2,qcdl4
       common/partwo/nf
@@ -221,35 +222,27 @@ c
 c Compute the parton densities
 c
         scale=dsqrt(q2)
-        scale=dsqrt(q2)
         iset=isetmstw
 c
       G1   = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XA,scale,0)
-      UT1  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XA,scale,5)
-      UV1  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XA,scale,11)
+      BT1  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XA,scale,5) 
+      BB1  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XA,scale,-5)
+
 c
       G1XA = G1/XA
-      UTXA = UT1/XA
-      USXA = (UT1-UV1)/XA
-      UVXA = UV1/XA
+      BTXA = BT1/XA
+      BBXA = BB1/XA
 c
       G2   = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XB,scale,0)
-      UT2  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XB,scale,5)
-      UV2  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XB,scale,11)
-c Idk if this is correct since I need b-bar...
+      BT2 = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XB,scale,5)   
+      BB2 = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XB,scale,-5)  
+c 
       G2XB = G2/XB
-      UTXB = UT2/XB
-      USXB = (UT2-UV2)/XB
-      
-
-c      for gu -> t gamma
-      SFPARTel  = G1XA*USXB+(UVXA+USXA)*G2XB 
-c      for gc -> t gamma
-c       SFPARTel  = G1XA*CSXB+CSXA*G2XB 
-c      for all: gu, gc, -> t gamma 
-c      SFPARTel  = G1XA*(UVXB+2.D0*USXB+2.D0*CSXB)
-c     & +(UVXA+2.D0*USXA+2.D0*CSXA)*G2XB
-
+      BTXB = BT2/XB
+      BBXB = BB2/XB  
+c 
+c      for b bbar -> H W
+      SFPARTel  = BTXA*BBXB + BBXA*BTXB
 c
 c      print '(''SFPARTel='',d20.7)',SFPARTel
 c
@@ -289,61 +282,26 @@ c
 c
 c Compute the parton densities
         scale=dsqrt(q2)
-c Commented out the below!
-c      CALL MRST2(XA,q2,UV1,DV1,USEA1,DSEA1,STR1,CHM1,BTM1,G1)
-c
-c      G1XA = G1/XA
-c      UVXA = UV1/XA
-c      USXA = USEA1/XA
-c      CSXA = CHM1/XA 
-c
-c      CALL MRST2(XB,q2,UV2,DV2,USEA2,DSEA2,STR2,CHM2,BTM2,G2)
-c
-c      G2XB = G2/XB
-c      UVXB = UV2/XB
-c      USXB = USEA2/XB
-c      CSXB = CHM2/XB
-
-c commenting the above
-
-c      CHARACTER prefix*50,prefix1*55,flavours(-5:5)*10,
-c     &     xfilename*50,qfilename*50
-c 
-c      prefix = "Grids/mstw2008nnlo.90cl" ! prefix for the grid files
-c
-c Compute the parton densities
-        scale=dsqrt(q2)
         iset=isetmstw
 c
       G1   = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XA,scale,0)
-      UT1  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XA,scale,5)
-      UV1  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XA,scale,11)
+      BT1  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XA,scale,5) 
+      BB1  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XA,scale,-5)
 c
       G1XA = G1/XA
-      UTXA = UT1/XA
-      USXA = (UT1-UV1)/XA
-      UVXA = UV1/XA
+      BTXA = BT1/XA
+      BBXA = BB1/XA
 c
       G2   = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XB,scale,0)
-      UT2  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XB,scale,5)
-      UV2  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XB,scale,11)
+      BT2 = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XB,scale,5)   
+      BB2 = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XB,scale,-5)  
 c
       G2XB = G2/XB
-      UTXB = UT2/XB
-      USXB = (UT2-UV2)/XB
-      
-c stuff above just copied.
-
-
+      BTXB = BT2/XB
+      BBXB = BB2/XB
 c
-c      for gu -> t gamma
-      SFPARTinel  = G1XA*USXB+(UVXA+USXA)*G2XB 
-c      for gc -> t gamma
-c       SFPARTinel  = G1XA*CSXB+CSXA*G2XB
-c      for all: gu, gc, -> t gamma
-c      SFPARTinel  = G1XA*(UVXB+2.D0*USXB+2.d0*CSXB)
-c     & +(UVXA+2.D0*USXA+2.D0*CSXA)*G2XB
-c
+c      for b bbar -> H W
+      SFPARTinel  = BTXA*BBXB + BBXA*BTXB 
 c
 c the computation of the parton cross section for uu:
 c  the flag norder selects the order:
@@ -379,7 +337,7 @@ c____________________________________________________________
 c
       parameter(pi=3.14159265359d0)       
 c
-      sigb0=qqdtdu(shel,m2,t1el,u1el)
+      sigb0=qqdtdu(shel,m2,t1el,u1el,tb)
 c
 c      print '(''sigb0='',d20.7)',sigb0
 c
@@ -404,6 +362,7 @@ c___________________________________________________________________
       common/t1u1/t1el,u1el,shel
       common/partwo/nf
 c
+      common/cross/scap
       parameter(pi=3.14159265359d0)
 c
       srs=dsqrt(shel)
@@ -412,7 +371,7 @@ c
 c
       lns4max=dlog(s4max/m2)
 c Born piece
-      sigb0=qqdtdu(shel,m2,t1el,u1el)
+      sigb0=qqdtdu(shel,m2,t1el,u1el,tb)
 c 
       ca=3.d0
       cf=4.d0/3.d0
@@ -431,7 +390,7 @@ c
 c 
        c3m=4.d0*cf
        c2mel=-2.d0*cf*dlog(mu**2/m2)-2.d0*cf*dlog(m2/shel)
-     & -2.d0*cf*dlog(-uwel/m2)-2.d0*dlog(-twel/m2)
+     & -2.d0*cf*dlog(-uwel/m2)-2.d0*cf*dlog(-twel/m2)
 c
 c The NNLL MSbar \delta(s_4) term
 c
@@ -441,8 +400,7 @@ c
 c MSbar NLL
       f1=(c3m*lns4max**2/2.d0+c2mel*lns4max+c1mel)
      & *alfas/pi*sigb0         
-      print '(''f1='',d20.7)',f1
-
+c      print '(''f1='',d20.7)',f1
 c
 c Computation of  surface term:
       s6=f1
@@ -469,6 +427,7 @@ c___________________________________________________________________
       common/t1u1sh/t1,u1,sh
       common/partwo/nf
 c
+      common/cross/scap
       parameter(pi=3.14159265359d0)
 c
       srs=dsqrt(sh)
@@ -481,8 +440,8 @@ c
       cf=4.d0/3.d0
       betaz=(11.d0*ca-2.d0*nf)/3.d0
 c Born piece
-      sigbs4=qqdtdu(sh,m2,t1,u1)
-      sigb0=qqdtdu(shel,m2,t1el,u1el)
+      sigbs4=qqdtdu(sh,m2,t1,u1,tb)
+      sigb0=qqdtdu(shel,m2,t1el,u1el,tb)
 c
        MW2=80.385d0**2
 c
@@ -500,9 +459,9 @@ c
 c
        c3m=4.d0*cf
        c2mel=-2.d0*cf*dlog(mu**2/m2)-2.d0*cf*dlog(m2/shel)
-     & -2.d0*cf*dlog(-uwel/m2)-2.d0*dlog(-twel/m2)
+     & -2.d0*cf*dlog(-uwel/m2)-2.d0*cf*dlog(-twel/m2)
        c2minel=-2.d0*cf*dlog(mu**2/m2)-2.d0*cf*dlog(m2/sh)
-     & -2.d0*cf*dlog(-uwinel/m2)-2.d0*dlog(-twinel/m2)
+     & -2.d0*cf*dlog(-uwinel/m2)-2.d0*cf*dlog(-twinel/m2)
 c
 c MSbar NLL
       df1ds4inel=(c3m*lns4/ss4+c2minel/ss4)
@@ -540,7 +499,7 @@ c
 c
       lns4max=dlog(s4max/m2)
 c Born piece
-      sigb0=qqdtdu(shel,m2,t1el,u1el)
+      sigb0=qqdtdu(shel,m2,t1el,u1el,tb)
 c
       cf=4.d0/3.d0 
       ca=3.d0
@@ -580,7 +539,7 @@ c scale+zeta NNLL terms
      & *dlog(mu**2/m2) + 2.d0*c2mel*T2mel
      & -zeta2*c3m**2)
 c log^2(scale)+zeta 1/s4 terms
-     & + lns4max*(c2mel*c1mel - zeta2*c3m*c2el
+     & + lns4max*(c2mel*c1mel - zeta2*c3m*c2el +zeta3*c3m**2
      & + betaz/4.d0*c2mel*dlog(mu**2/m2)
      & + cf*betaz/4.d0*(dlog(mu**2/m2))**2)
 c Computation of integral and surface term:
@@ -617,8 +576,8 @@ c
       lns4=dlog(ss4/m2)
 c
 c Born piece
-      sigbs4=qqdtdu(sh,m2,t1,u1)
-      sigb0=qqdtdu(shel,m2,t1el,u1el)
+      sigbs4=qqdtdu(sh,m2,t1,u1,tb)
+      sigb0=qqdtdu(shel,m2,t1el,u1el,tb)
 c
       cf=4.d0/3.d0
       ca=3.d0
@@ -700,14 +659,14 @@ C
 c
 c_______________________________________________________________________
 c***********************************************************
-      double precision function qqdtdu(sh,m2,t1,u1)
+      double precision function qqdtdu(sh,m2,t1,u1,tb)
       implicit double precision(a-z)
 c
       PARAMETER( PI = 3.14159265359D0)
       common/parsqq/coef,cqq
       common/qcdpar/q2,qcdl4
       common/pdfalfa/alfas
-
+c      common tb
 c  Conversion factor from gev^-2 to units of 10^-30 cm^2
 c
       norm = 19.733*19.733
@@ -720,18 +679,14 @@ c  the coefficients
 c
       sw2=0.23120
       sw4=sw2**2
-c the c2w is cos (2theta2)
-c as if this doesn't evolve lolol
       gg2=4.d0*pi*alfas
       alfa=1.d0/128.d0
       alfa2=alfa*alfa 
       tb=30d0
       cb=1.d0/tb
-c uhhh about that alpha
 c    
       tm = t1 + m2
       um = u1 + m2
-      mz2 = 91.1876d0**2
       mt=173.d0
       mt2=mt**2
       mt4=mt2**2
@@ -739,16 +694,15 @@ c
 c
       mu=dsqrt(q2)
 c
-c    d sigma du dt
+c    dq= ddsigma du dt
 c  
       c1=pi*alfa2*mt4*cb**2/96.d0/sw4/MW2
 c
-      dq=(2*c1*Sqrt(-4*mh2*mw2 + (tm + um)**2)*(2*mw2**2 
-     &- 2*mw2*(tm + um) + tm*(sh + 2*um)))/
-     - (mw2*sh**4*(mt2 - tm)**2*Sqrt((-4*mh2*mw2 + (tm + um)**2)/sh**2))
+      dq=(2*c1*(2*mw2**2- 2*mw2*(tm + um) + tm*(sh + 2*um)))/
+     - (mw2*sh**5*(mt2 - tm)**2)
       qqdtdu=norm*dq
 c
-c      print '(''qqdtdu='',d20.7)',dq
+c      print '(''qqdtdu='',d20.7)',2*mw2**2-tm*(sh + 2*um)
 c
       return
       end

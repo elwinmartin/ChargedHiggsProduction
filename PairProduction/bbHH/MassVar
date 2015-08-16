@@ -3,8 +3,9 @@
 #gfortran -mips2 bbhh.o vegas_en.o mstwpdf.o alphaS.o -o bbhh.x
 #./bbhh.x
 
+filename=$1
 decimal=".d0"
-
+echo "" > outputmass.dat
 for i in `seq 1 50`
 do
         num=$((200 + 16 *$i))
@@ -14,3 +15,4 @@ do
 #        echo $arg
 #        cat gutg.dat
 done
+cp outputmass.dat $filename

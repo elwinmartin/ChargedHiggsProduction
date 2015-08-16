@@ -220,35 +220,26 @@ c
 c Compute the parton densities
 c
         scale=dsqrt(q2)
-        scale=dsqrt(q2)
         iset=isetmstw
 c
       G1   = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XA,scale,0)
-      UT1  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XA,scale,5)
-      UV1  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XA,scale,11)
+      BT1  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XA,scale,5)    
+      BB1  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XA,scale,-5)   
 c
       G1XA = G1/XA
-      UTXA = UT1/XA
-      USXA = (UT1-UV1)/XA
-      UVXA = UV1/XA
+      BTXA = BT1/XA
+      BBXA = BB1/XA
 c
-      G2   = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XB,scale,0)
-      UT2  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XB,scale,5)
-      UV2  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XB,scale,11)
-c Idk if this is correct since I need b-bar...
+      G2  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XB,scale,0)
+      BT2 = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XB,scale,5)    
+      BB2 = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XB,scale,-5)   
+c 
       G2XB = G2/XB
-      UTXB = UT2/XB
-      USXB = (UT2-UV2)/XB
-      
-
-c      for gu -> t gamma
-      SFPARTel  = G1XA*USXB+(UVXA+USXA)*G2XB 
-c      for gc -> t gamma
-c       SFPARTel  = G1XA*CSXB+CSXA*G2XB 
-c      for all: gu, gc, -> t gamma 
-c      SFPARTel  = G1XA*(UVXB+2.D0*USXB+2.D0*CSXB)
-c     & +(UVXA+2.D0*USXA+2.D0*CSXA)*G2XB
-
+      BTXB = BT2/XB
+      BBXB = BB2/XB     
+c
+c      for b bbar -> H H
+      SFPARTel  = BTXA*BBXB +BBXA*BTXB
 c
 c      print '(''SFPARTel='',d20.7)',SFPARTel
 c
@@ -315,33 +306,23 @@ c Compute the parton densities
         iset=isetmstw
 c
       G1   = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XA,scale,0)
-      UT1  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XA,scale,5)
-      UV1  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XA,scale,11)
+      BT1  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XA,scale,5)    
+      BB1  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XA,scale,-5)   
 c
       G1XA = G1/XA
-      UTXA = UT1/XA
-      USXA = (UT1-UV1)/XA
-      UVXA = UV1/XA
+      BTXA = BT1/XA
+      BBXA = BB1/XA
 c
-      G2   = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XB,scale,0)
-      UT2  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XB,scale,5)
-      UV2  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XB,scale,11)
+      G2  = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XB,scale,0)
+      BT2 = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XB,scale,5)    
+      BB2 = GetOnePDF("../../Grids/mstw2008nnlo.90cl",iset,XB,scale,-5)   
 c
       G2XB = G2/XB
-      UTXB = UT2/XB
-      USXB = (UT2-UV2)/XB
-      
-c stuff above just copied.
-
-
+      BTXB = BT2/XB
+      BBXB = BB2/XB
 c
-c      for gu -> t gamma
-      SFPARTinel  = G1XA*USXB+(UVXA+USXA)*G2XB 
-c      for gc -> t gamma
-c       SFPARTinel  = G1XA*CSXB+CSXA*G2XB
-c      for all: gu, gc, -> t gamma
-c      SFPARTinel  = G1XA*(UVXB+2.D0*USXB+2.d0*CSXB)
-c     & +(UVXA+2.D0*USXA+2.D0*CSXA)*G2XB
+c      for b bbar -> H H
+      SFPARTinel  = BTXA*BBXB +BBXA*BTXB 
 c
 c
 c the computation of the parton cross section for uu:
@@ -490,9 +471,9 @@ c
        mq=dsqrt(m2)
 c
        c3m=4.d0*cf
-       c2mel=-2.d0*dlog(mu**2/m2)-2.d0*cf*dlog(m2/shel)
+       c2mel=-2.d0*cf*dlog(mu**2/m2)-2.d0*cf*dlog(m2/shel)
      & -2.d0*cf*dlog(-u1el/m2)-2.d0*cf*dlog(-t1el/m2)
-       c2minel=-2.d0*dlog(mu**2/m2)-2.d0*cf*dlog(m2/sh)
+       c2minel=-2.d0*cf*dlog(mu**2/m2)-2.d0*cf*dlog(m2/sh)
      & -2.d0*cf*dlog(-u1/m2)-2.d0*cf*dlog(-t1/m2)
 c
 c MSbar NLL
@@ -571,7 +552,7 @@ c scale+zeta NNLL terms
      & *dlog(mu**2/m2) + 2.d0*c2mel*T2mel
      & -zeta2*c3m**2)
 c log^2(scale)+zeta 1/s4 terms
-     & + lns4max*(c2mel*c1mel - zeta2*c3m*c2el
+     & + lns4max*(c2mel*c1mel - zeta2*c3m*c2el +zeta3*c3m**2
      & + betaz/4.d0*c2mel*dlog(mu**2/m2)
      & + cf*betaz/4.d0*(dlog(mu**2/m2))**2)
 c Computation of integral and surface term:
