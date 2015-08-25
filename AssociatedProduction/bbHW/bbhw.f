@@ -17,7 +17,6 @@ c-----------------------------------------------------------
       common/partwo/nf
       common/pdfalfa/alfas
       common/pdfmstw/isetmstw
-c      common tb
 c
       parameter(pi=3.14159265359d0)
 c                                                                     
@@ -40,7 +39,7 @@ c
       read(11,*)mq
       read(11,*)qcdl4
       read(11,*)nscale
-      read(11,*)tb
+      read(11,*)tb1
 c
       print '(''number of points :'',i7)',pts
       print '(''number of iterations :'',i7)',its
@@ -50,7 +49,7 @@ c
       print '(''charged higgs mass:'',d20.7)',mq
       print '(''qcdl4:'',d20.7)',qcdl4
       print '(''scale (1)m (0)m/2 (2)2m:'',i2)',nscale
-c      print '(''tan beta:'',d20.7)',tb
+      print '(''tan beta:'',d20.7)',tb1
 c
       scap = srcaps*srcaps
 c
@@ -60,6 +59,7 @@ c      do 510 iloop= 1,20
 c      mql(iloop) = 50d0*dble(iloop-1.d0) + 500.d0
 c      mq=mql(iloop)        
       m2 = mq*mq
+      tb = tb1
       if (nscale.eq.0) then
          q2 = m2/4.d0
          elseif (nscale.eq.1) then 
@@ -193,12 +193,12 @@ c transported through common blocks.
 c
       if(norder.ge.1)then
          f=jacob1*jacob2*jacob3*ejacob
-     & *aptel(s4max,m2,xael,xbel)
+     & *aptel(s4max,m2,xael,xbel,tb)
      &    +jacob1*jacob2*jacob3*jacob4
-     & *aptinel(ss4,m2,xa,xb)
+     & *aptinel(ss4,m2,xa,xb,tb)
       else
          f=jacob1*jacob2*jacob3*ejacob
-     & *aptel(s4max,m2,xael,xbel)
+     & *aptel(s4max,m2,xael,xbel,tb)
       endif
 c      print '(''f='',d20.7)',f
 c
@@ -207,7 +207,7 @@ c
 c
 c----------------------------------------------------------------------
 c
-      double precision function aptel(s4max,m2,xa,xb)
+      double precision function aptel(s4max,m2,xa,xb,tb)
       implicit double precision(a-z)
       integer norder, iset 
       common/parone/norder      
@@ -250,13 +250,13 @@ c the computation of the parton cross section for uu:
 c  the flag norder selects the order:
 c  born (0), 1st order (1), 2nd order (2)
       if(norder.eq.0)then
-          call siqqborn(s5,m2)
+          call siqqborn(s5,m2,tb)
           sigtau = s5
        elseif(norder.eq.1)then
-          call siqqone1(s6,s4max,m2)
+          call siqqone1(s6,s4max,m2,tb)
           sigtau = s6
        elseif(norder.eq.2)then
-          call siqqtwo1(s7,s4max,m2)
+          call siqqtwo1(s7,s4max,m2,tb)
           sigtau = s7
        endif
 c
@@ -268,7 +268,7 @@ c
         end
 c**********************************************************
 c
-      double precision function aptinel(ss4,m2,xa,xb)
+      double precision function aptinel(ss4,m2,xa,xb,tb)
       implicit double precision(a-z)
       integer norder
       common/parone/norder      
@@ -307,13 +307,13 @@ c the computation of the parton cross section for uu:
 c  the flag norder selects the order:
 c  born (0), 1st order (1), 2nd order (2)
       if(norder.eq.0)then
-          call siqqborn(s5,m2)
+          call siqqborn(s5,m2,tb)
           sigtau = s5
        elseif(norder.eq.1)then
-          call siqqone2(s6,ss4,m2)
+          call siqqone2(s6,ss4,m2,tb)
           sigtau = s6
        elseif(norder.eq.2)then
-          call siqqtwo2(s7,ss4,m2)
+          call siqqtwo2(s7,ss4,m2,tb)
           sigtau = s7
        endif
 c
@@ -328,7 +328,7 @@ c
         end
 c-----------------------------------------------------------------------
 c
-       subroutine siqqborn(s5,m2)
+       subroutine siqqborn(s5,m2,tb)
 c_________________________________________________________________
 cIn this subroutine the Born cross section is computed
 c____________________________________________________________
@@ -349,7 +349,7 @@ c
 
 c________________________________________________________________________
 c
-      subroutine siqqone1(s6,s4max,m2)
+      subroutine siqqone1(s6,s4max,m2,tb)
 c__________________________________________________________________
 c In this subroutine the first order correction to the
 c cross section is computed in the MSbar scheme, elastic piece
@@ -410,7 +410,7 @@ c
 c
 c________________________________________________________________________
 c
-      subroutine siqqone2(s6,ss4,m2)
+      subroutine siqqone2(s6,ss4,m2,tb)
 c__________________________________________________________________
 c In this subroutine the first order correction to the 
 c cross section is computed in the MSbar scheme, inelastic piece
@@ -480,7 +480,7 @@ c
 c
 c_______________________________________________________________________
 c
-      subroutine siqqtwo1(s7,s4max,m2)
+      subroutine siqqtwo1(s7,s4max,m2,tb)
 c----------------------------------------------------------------------
 c In this subroutine the second order correction to the cross
 c is computed in the MSbar scheme, elastic piece
@@ -552,7 +552,7 @@ C
 c
 c_______________________________________________________________________
 c
-      subroutine siqqtwo2(s7,ss4,m2)
+      subroutine siqqtwo2(s7,ss4,m2,tb)
 c----------------------------------------------------------------------
 c In this subroutine the second order correction to the cross
 c is computed in the MSbar scheme, inelastic piece
@@ -666,7 +666,7 @@ c
       common/parsqq/coef,cqq
       common/qcdpar/q2,qcdl4
       common/pdfalfa/alfas
-c      common tb
+c      common/mass/tb
 c  Conversion factor from gev^-2 to units of 10^-30 cm^2
 c
       norm = 19.733*19.733
@@ -682,7 +682,7 @@ c
       gg2=4.d0*pi*alfas
       alfa=1.d0/128.d0
       alfa2=alfa*alfa 
-      tb=30d0
+c      tb=30d0
       cb=1.d0/tb
 c    
       tm = t1 + m2
@@ -698,8 +698,8 @@ c    dq= ddsigma du dt
 c  
       c1=pi*alfa2*mt4*cb**2/96.d0/sw4/MW2
 c
-      dq=(2*c1*(2*mw2**2- 2*mw2*(tm + um) + tm*(sh + 2*um)))/
-     - (mw2*sh**5*(mt2 - tm)**2)
+      dq=(2*c1*(2*mw2**2 + mw2*(sh - tm - um) + tm*um))/
+     - (mw2*sh**2*(mt2 - tm)**2)
       qqdtdu=norm*dq
 c
 c      print '(''qqdtdu='',d20.7)',2*mw2**2-tm*(sh + 2*um)

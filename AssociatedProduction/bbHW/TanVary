@@ -1,0 +1,10 @@
+#!/bin/bash
+decimal=".d0"
+
+for i in `seq 1 30`
+do
+        num=$((0 + $i))
+        arg=$num$decimal
+        sed -i 9s/.*/"$arg"/ bbhw.dat
+        ./bbhw.x
+done
